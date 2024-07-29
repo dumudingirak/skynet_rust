@@ -1,4 +1,3 @@
-#[derive(Debug)]
 pub struct BenchmarkResults{
     pub median:u128,
     pub average:f64,
