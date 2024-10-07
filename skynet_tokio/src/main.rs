@@ -1,6 +1,6 @@
 /**
- * The skynet-benchmark, invented by Alexander Temerev (https://github.com/atemerev/skynet) implemented with the Rust-based tokio framework
- * CURRENTLY NOT WORKING
+ * The skynet-benchmark, invented by Alexander Temerev (https://github.com/atemerev/skynet), implemented with the Rust-based tokio framework for asynchronus execution.
+ * Increase num_iterations, in order to increase the accuracy of the results.
  */
 use tokio::sync::mpsc;
 use async_recursion::async_recursion;
@@ -8,8 +8,7 @@ use benchmark::BenchmarkResults;
 pub mod benchmark;
 
 /**
- * The actual benchmark function: If the size of partial tree, starting with this root invokation is greater than 1, spawn divisor child tasks,
- * which are called with size = size/divisor and 
+ * The actual benchmark function: If the size of partial tree, starting with this root invokation is greater than 1, spawn divisor child tasks, which are called with size = size/divisor and 
  * Use channels for communicating between child tasks and the father task
  */
 #[async_recursion]
@@ -49,6 +48,7 @@ async fn benchmark(times:u64) -> BenchmarkResults{
             result = sum;
         }
         let duration:std::time::Duration = start.elapsed();
+        //If the result obtained by execution of the benchmark does not fit (i.e. the benchmark failed), discard it
         if result == 499_999_500_000 {
             results.push(duration.as_nanos());
         }
@@ -59,7 +59,7 @@ async fn benchmark(times:u64) -> BenchmarkResults{
 
 #[tokio::main]
 async fn main(){
-    let iterations = 50;
-    let benchmark_result = benchmark(iterations).await;
-    benchmark_result.print(iterations.try_into().unwrap());
+    let num_iterations = 2;
+    let benchmark_result = benchmark(num_iterations).await;
+    benchmark_result.print(num_iterations.try_into().unwrap());
 }

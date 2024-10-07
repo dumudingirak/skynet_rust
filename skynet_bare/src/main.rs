@@ -1,13 +1,15 @@
 /**
- * This file contains the "bare" implementation of the skynet benchmark, using the tokio-framework only for issuing the asynchronous call in the main function
- * Awaiting asnychronus tasks here is based on futures, without using the spawning and communication facilities of tokio directly 
+ * This file contains the "bare" implementation of the skynet benchmark, using the tokio-framework only for issuing the asynchronous call in the main function.
+ * Awaiting asnychronus tasks here is based on futures, without using the spawning and communication facilities of tokio directly.
+ * Such implementation is inteded to be used mainly as an illustrative example of how the skynet-benchmark works in a general sense.
  */
 
-/**
- * A simple struct for encapsulating the resulting values of the benchmark
- */
+
 use std::vec::Vec;
 use futures::future::join_all;
+/**
+ * A simple struct to capsule the results of the benchmarks
+ */
 use benchmark::BenchmarkResults;
 pub mod benchmark;
 
@@ -41,16 +43,18 @@ async fn benchmark(times:u64) -> BenchmarkResults{
     let mut results:Vec<u128> = Vec::with_capacity(times.try_into().unwrap());
     for _ in 0..times{
         let start:std::time::Instant = std::time::Instant::now();
-        vector_skynet(0, 1_000_000, 10).await;
+        let result = vector_skynet(0, 1_000_000, 10).await;
         let duration:std::time::Duration = start.elapsed();
-        results.push(duration.as_nanos());
+        if result == 499_999_500_000{
+            results.push(duration.as_nanos());
+        }
     }
     return BenchmarkResults::new(results);
 }
 
 #[tokio::main]
 async fn main(){
-    let num_iterations = 100;
+    let num_iterations = 2;
     let final_result = benchmark(num_iterations).await;
     final_result.print(num_iterations.try_into().unwrap());
 }

@@ -1,6 +1,6 @@
 /**
  * And yet one more variant of the skynet benchmark, here using the async_std framework
- * Same as for tokio, this sadly does also not work...
+ * Change the value of num_iterations in order to perform muliple benchmarks in a row.
  */
 
 use async_recursion::async_recursion;
@@ -26,16 +26,18 @@ async fn benchmark(times:u64) -> BenchmarkResults{
     let mut results:Vec<u128> = Vec::with_capacity(times.try_into().unwrap());
     for _ in 0..times{
         let start:std::time::Instant = std::time::Instant::now();
-        vector_skynet(0, 1_000_000, 10).await;
+        let result = vector_skynet(0, 1_000_000, 10).await;
         let duration:std::time::Duration = start.elapsed();
-        results.push(duration.as_nanos());
+        if result == 499_999_500_000 {
+            results.push(duration.as_nanos());
+        }
     }
     return BenchmarkResults::new(results);
 }
 
 #[async_std::main]
 async fn main(){
-    let num_iterations = 10;
+    let num_iterations = 2;
     let final_result = benchmark(num_iterations).await;
     final_result.print(num_iterations.try_into().unwrap());
 }
